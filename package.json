@@ -7,8 +7,9 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "android:add": "npm run build && npx cap add android",
-    "android:sync": "npm run build && npx cap sync android",
+    "android:add": "npm run build && npx cap add android && npm run android:configure",
+    "android:sync": "npm run build && npx cap sync android && npm run android:configure",
+    "android:configure": "node scripts/configure-android.mjs",
     "android:open": "npx cap open android"
   },
   "dependencies": {
@@ -18,7 +19,9 @@
     "vite-plugin-pwa": "^0.21.1",
     "@capacitor/android": "^7.0.1",
     "@capacitor/cli": "^7.0.1",
-    "@capacitor/core": "^7.0.1"
+    "@capacitor/core": "^7.0.1",
+    "@capacitor/screen-orientation": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.1"
   },
   "devDependencies": {}
 }
