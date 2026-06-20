@@ -1,3 +1,5 @@
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
+
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? '';
 const PENDING_KEY = 'beer-roulette:pending-decrements';
 
@@ -62,6 +64,27 @@ export function clearPending() {
 }
 
 async function request(path, options = {}) {
+  if (Capacitor.isNativePlatform()) {
+    const method = options.method ?? 'GET';
+    const nativeResponse = await CapacitorHttp.request({
+      url: `${API_BASE}${path}`,
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+      },
+      data: options.body ? JSON.parse(options.body) : undefined
+    });
+
+    const body = nativeResponse.data;
+
+    if (nativeResponse.status < 200 || nativeResponse.status >= 300 || body?.ok === false) {
+      throw new Error(body?.message ?? 'API request failed');
+    }
+
+    return body;
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
     headers: {
       'Content-Type': 'application/json',

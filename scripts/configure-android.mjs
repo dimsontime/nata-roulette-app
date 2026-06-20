@@ -30,7 +30,19 @@ function configureManifest() {
     return;
   }
 
-  const source = readFileSync(manifestPath, 'utf8');
+  let source = readFileSync(manifestPath, 'utf8');
+  const applicationPattern = /<application\b[^>]*>/;
+  const applicationMatch = source.match(applicationPattern);
+
+  if (applicationMatch && !applicationMatch[0].includes('android:usesCleartextTraffic=')) {
+    const applicationTag = applicationMatch[0].replace(
+      '<application',
+      '<application\n        android:usesCleartextTraffic="true"'
+    );
+
+    source = source.replace(applicationMatch[0], applicationTag);
+  }
+
   const activityPattern = /<activity\b[^>]*android:name="\.MainActivity"[^>]*>/;
   const match = source.match(activityPattern);
 

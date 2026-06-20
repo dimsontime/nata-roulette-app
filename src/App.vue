@@ -93,7 +93,7 @@ async function loadProducts() {
   try {
     products.value = await fetchProducts();
   } catch {
-    message.value = 'Бэк недоступен, используем локальные остатки до первой синхронизации.';
+    message.value = '';
   }
 }
 
@@ -102,10 +102,10 @@ async function trySyncPending() {
     const syncedProducts = await syncPending();
     if (syncedProducts) {
       products.value = syncedProducts;
-      message.value = 'Отложенные списания отправлены на сервер.';
+      message.value = '';
     }
   } catch {
-    message.value = 'Есть неотправленные списания, попробуем снова при следующем запуске.';
+    message.value = '';
   } finally {
     refreshPendingCount();
   }
@@ -143,7 +143,7 @@ async function persistWin(product) {
     products.value = products.value.map((item) =>
       item.id === product.id ? { ...item, stock: Math.max(item.stock - 1, 0) } : item
     );
-    message.value = 'Сервер не ответил, приз сохранен локально для повторной отправки.';
+    message.value = '';
   } finally {
     isPersisting.value = false;
     refreshPendingCount();
@@ -183,7 +183,6 @@ onMounted(async () => {
           <span class="pulse-ring pulse-ring-3" aria-hidden="true"></span>
           <span class="primary-action-label">ПОДАРОК</span>
         </button>
-        <p v-if="message" class="message">{{ message }}</p>
       </section>
 
       <section v-else-if="phase === 'video'" key="video" class="video-screen">
@@ -213,8 +212,6 @@ onMounted(async () => {
         <div class="result-copy">
           <h3>{{ currentResult?.title }}</h3>
           <p>Спасибо, что заглянули в гости!</p>
-          <p v-if="isPersisting" class="message">Обновляем остатки...</p>
-          <p v-else-if="message" class="message">{{ message }}</p>
         </div>
       </section>
     </Transition>
